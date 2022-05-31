@@ -24,12 +24,12 @@ import javax.swing.JPanel;
 public class Game implements Runnable{
 
 
-        private String ip = "localhost";
-        private int port = 22222;
+        private final String IP;
+        private int port;
         private Scanner scanner = new Scanner(System.in);
         private JFrame frame;
-        private final int WIDTH = 506;
-        private final int HEIGHT = 527;
+        private int width = 506;
+        private int height = 527;
         private Thread thread;
 
         private Painter painter;
@@ -82,7 +82,7 @@ public class Game implements Runnable{
 
         public Game() {
             System.out.println("Please input the IP: ");
-            ip = scanner.nextLine();
+            IP = scanner.nextLine();
             System.out.println("Please input the port: ");
             port = scanner.nextInt();
             while (port < 1 || port > 65535) {
@@ -93,14 +93,14 @@ public class Game implements Runnable{
             loadImages();
 
             painter = new Painter();
-            painter.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+            painter.setPreferredSize(new Dimension(width, height));
 
             if (!connect()) initializeServer();
 
             frame = new JFrame();
             frame.setTitle("Tic-Tac-Toe");
             frame.setContentPane(painter);
-            frame.setSize(WIDTH, HEIGHT);
+            frame.setSize(width, height);
             frame.setLocationRelativeTo(null);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setResizable(false);
@@ -130,7 +130,7 @@ public class Game implements Runnable{
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
                 int stringWidth = g2.getFontMetrics().stringWidth(unableToCommunicateWithOpponentString);
-                g.drawString(unableToCommunicateWithOpponentString, WIDTH / 2 - stringWidth / 2, HEIGHT / 2);
+                g.drawString(unableToCommunicateWithOpponentString, width / 2 - stringWidth / 2, height / 2);
                 return;
             }
 
@@ -162,10 +162,10 @@ public class Game implements Runnable{
                     g.setFont(largerFont);
                     if (won) {
                         int stringWidth = g2.getFontMetrics().stringWidth(wonString);
-                        g.drawString(wonString, WIDTH / 2 - stringWidth / 2, HEIGHT / 2);
+                        g.drawString(wonString, width / 2 - stringWidth / 2, height / 2);
                     } else if (enemyWon) {
                         int stringWidth = g2.getFontMetrics().stringWidth(enemyWonString);
-                        g.drawString(enemyWonString, WIDTH / 2 - stringWidth / 2, HEIGHT / 2);
+                        g.drawString(enemyWonString, width / 2 - stringWidth / 2, height / 2);
                     }
                 }
                 if (tie) {
@@ -173,7 +173,7 @@ public class Game implements Runnable{
                     g.setColor(Color.BLACK);
                     g.setFont(largerFont);
                     int stringWidth = g2.getFontMetrics().stringWidth(tieString);
-                    g.drawString(tieString, WIDTH / 2 - stringWidth / 2, HEIGHT / 2);
+                    g.drawString(tieString, width / 2 - stringWidth / 2, height / 2);
                 }
             } else {
                 g.setColor(Color.RED);
@@ -181,7 +181,7 @@ public class Game implements Runnable{
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
                 int stringWidth = g2.getFontMetrics().stringWidth(waitingString);
-                g.drawString(waitingString, WIDTH / 2 - stringWidth / 2, HEIGHT / 2);
+                g.drawString(waitingString, width / 2 - stringWidth / 2, height / 2);
             }
 
         }
@@ -264,12 +264,12 @@ public class Game implements Runnable{
 
         private boolean connect() {
             try {
-                socket = new Socket(ip, port);
+                socket = new Socket(IP, port);
                 dos = new DataOutputStream(socket.getOutputStream());
                 dis = new DataInputStream(socket.getInputStream());
                 accepted = true;
             } catch (IOException e) {
-                System.out.println("Unable to connect to the address: " + ip + ":" + port + " | Starting a server");
+                System.out.println("Unable to connect to the address: " + IP + ":" + port + " | Starting a server");
                 return false;
             }
             System.out.println("Successfully connected to the server.");
@@ -278,7 +278,7 @@ public class Game implements Runnable{
 
         private void initializeServer() {
             try {
-                serverSocket = new ServerSocket(port, 8, InetAddress.getByName(ip));
+                serverSocket = new ServerSocket(port, 8, InetAddress.getByName(IP));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -298,10 +298,10 @@ public class Game implements Runnable{
             }
         }
 
-        @SuppressWarnings("unused")
-        public static void main(String[] args) {
-            Game ticTacToe = new Game();
-        }
+        //@SuppressWarnings("unused")
+        //public static void main(String[] args) {
+            //Game ticTacToe = new Game();
+        //}
 
         private class Painter extends JPanel implements MouseListener {
             private static final long serialVersionUID = 1L;
