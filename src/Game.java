@@ -1,62 +1,57 @@
 import java.net.Socket;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.Toolkit;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.image.BufferedImage;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.util.Scanner;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 public class Game implements Runnable{
 
 
-        private final String IP;
-        private int port;
+        //private final String IP;
+    private Painter painter;
+    private UserInteraction userInteraction;
+    private Player player;
+    private Network network;
+    private InitializeBoard initializeBoard;
+    //private Network network.port;
         private Scanner scanner = new Scanner(System.in);
-        private JFrame frame;
-        private int width = 506;
-        private int height = 527;
+        //private JFrame frame;
+        /*private int width = 506;
+        private int height = 527;*/
         private Thread thread;
 
-        private Painter painter;
-        private Socket socket;
-        private DataOutputStream dos;
+        //private Painter painter;
+        //private Socket socket;
+        /*private DataOutputStream dos;
         private DataInputStream dis;
 
-        private ServerSocket serverSocket;
+        private ServerSocket serverSocket;*/
 
-        private BufferedImage board;
+        /*private BufferedImage board;
         private BufferedImage redX;
         private BufferedImage blueX;
         private BufferedImage redCircle;
-        private BufferedImage blueCircle;
+        private BufferedImage blueCircle;*/
 
-        private String[] spaces = new String[9];
+        public String[] spaces = new String[9];
 
-        private boolean yourTurn = false;
-        private boolean circle = true;
-        private boolean accepted = false;
-        private boolean unableToCommunicateWithOpponent = false;
-        private boolean won = false;
-        private boolean enemyWon = false;
-        private boolean tie = false;
 
-        private int lengthOfSpace = 160;
-        private int errors = 0;
+        public boolean unableToCommunicateWithOpponent = false;
+        public static boolean won = false;
+        public boolean enemyWon = false;
+        private boolean draw = false;
+
+        public int lengthOfSpace = 160;
+        public int errors = 0;
         private int firstSpot = -1;
         private int secondSpot = -1;
 
@@ -66,9 +61,9 @@ public class Game implements Runnable{
 
         private String waitingString = "Waiting for another player";
         private String unableToCommunicateWithOpponentString = "Unable to communicate with opponent.";
-        private String wonString = "You won!";
-        private String enemyWonString = "Opponent won!";
-        private String tieString = "Game ended in a tie.";
+        private String wonString = "You are the winner!";
+        private String enemyWonString = "Opponent is the winner!";
+        private String drawString = "The game ended in a draw.";
 
         private int[][] wins = new int[][] { { 0, 1, 2 }, { 3, 4, 5 }, { 6, 7, 8 }, { 0, 3, 6 }, { 1, 4, 7 }, { 2, 5, 8 }, { 0, 4, 8 }, { 2, 4, 6 } };
 
@@ -80,7 +75,18 @@ public class Game implements Runnable{
          * </pre>
          */
 
-        public Game() {
+
+
+        /*public Game(InitializeBoard initializeBoard, Network network, Player player, UserInteraction userInteraction, Painter painter) {
+            this.player = player;
+            this.initializeBoard = initializeBoard;
+            this.network = network;
+            this.userInteraction = userInteraction;
+            this.painter = painter;
+            Player player = new Player();
+            System.out.println("Please enter your Playername");
+            String name = scanner.nextLine();
+            player.setName(name);
             System.out.println("Please input the IP: ");
             IP = scanner.nextLine();
             System.out.println("Please input the port: ");
@@ -90,14 +96,14 @@ public class Game implements Runnable{
                 port = scanner.nextInt();
             }
 
-            loadImages();
+            initializeBoard.loadImages();
 
             painter = new Painter();
-            painter.setPreferredSize(new Dimension(width, height));
+            painter.setPreferredSize(new Dimension(width, height));*/
 
-            if (!connect()) initializeServer();
+            //if (!connect()) initializeServer();
 
-            frame = new JFrame();
+/*            frame = new JFrame();
             frame.setTitle("Tic-Tac-Toe");
             frame.setContentPane(painter);
             frame.setSize(width, height);
@@ -108,46 +114,86 @@ public class Game implements Runnable{
 
             thread = new Thread(this, "TicTacToe");
             thread.start();
-        }
+        }*/
+
+    public Game(Network network, Player player, UserInteraction userInteraction) {
+        this.player = player;
+        this.network = network;
+        this.painter = new Painter(network, this);
+        this.initializeBoard = new InitializeBoard(506, 527, painter);
+        this.userInteraction = userInteraction;
+        this.painter = painter;
+            /*Player player = new Player();
+            System.out.println("Please enter your Playername");
+            String name = scanner.nextLine();
+            player.setName(name);
+            System.out.println("Please input the IP: ");
+            IP = scanner.nextLine();
+            System.out.println("Please input the port: ");
+            port = scanner.nextInt();
+            while (port < 1 || port > 65535) {
+                System.out.println("The port you entered was invalid, please input another port: ");
+                port = scanner.nextInt();
+            }*/
+
+        initializeBoard.loadImages();
+
+/*            painter = new Painter();
+            painter.setPreferredSize(new Dimension(width, height));*/
+
+        //if (!network.connect()) network.initializeServer();
+
+/*            frame = new JFrame();
+            frame.setTitle("Tic-Tac-Toe");
+            frame.setContentPane(painter);
+            frame.setSize(width, height);
+            frame.setLocationRelativeTo(null);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setResizable(false);
+            frame.setVisible(true);*/
+
+        thread = new Thread(this, "TicTacToe");
+        thread.start();
+    }
 
         public void run() {
             while (true) {
                 tick();
                 painter.repaint();
 
-                if (!circle && !accepted) {
-                    listenForServerRequest();
+                if (!network.isCircle() && !network.accepted) {
+                    network.listenForServerRequest();
                 }
 
             }
         }
 
-        private void render(Graphics g) {
-            g.drawImage(board, 0, 0, null);
+        public void render(Graphics g) {
+            g.drawImage(initializeBoard.board, 0, 0, null);
             if (unableToCommunicateWithOpponent) {
                 g.setColor(Color.RED);
                 g.setFont(smallerFont);
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
                 int stringWidth = g2.getFontMetrics().stringWidth(unableToCommunicateWithOpponentString);
-                g.drawString(unableToCommunicateWithOpponentString, width / 2 - stringWidth / 2, height / 2);
+                g.drawString(unableToCommunicateWithOpponentString, initializeBoard.getWidth() / 2 - stringWidth / 2, initializeBoard.getHeight() / 2);
                 return;
             }
 
-            if (accepted) {
+            if (network.accepted) {
                 for (int i = 0; i < spaces.length; i++) {
                     if (spaces[i] != null) {
                         if (spaces[i].equals("X")) {
-                            if (circle) {
-                                g.drawImage(redX, (i % 3) * lengthOfSpace + 10 * (i % 3), (int) (i / 3) * lengthOfSpace + 10 * (int) (i / 3), null);
+                            if (network.isCircle()) {
+                                g.drawImage(initializeBoard.redX, (i % 3) * lengthOfSpace + 10 * (i % 3), (int) (i / 3) * lengthOfSpace + 10 * (int) (i / 3), null);
                             } else {
-                                g.drawImage(blueX, (i % 3) * lengthOfSpace + 10 * (i % 3), (int) (i / 3) * lengthOfSpace + 10 * (int) (i / 3), null);
+                                g.drawImage(initializeBoard.blueX, (i % 3) * lengthOfSpace + 10 * (i % 3), (int) (i / 3) * lengthOfSpace + 10 * (int) (i / 3), null);
                             }
                         } else if (spaces[i].equals("O")) {
-                            if (circle) {
-                                g.drawImage(blueCircle, (i % 3) * lengthOfSpace + 10 * (i % 3), (int) (i / 3) * lengthOfSpace + 10 * (int) (i / 3), null);
+                            if (network.isCircle()) {
+                                g.drawImage(initializeBoard.blueCircle, (i % 3) * lengthOfSpace + 10 * (i % 3), (int) (i / 3) * lengthOfSpace + 10 * (int) (i / 3), null);
                             } else {
-                                g.drawImage(redCircle, (i % 3) * lengthOfSpace + 10 * (i % 3), (int) (i / 3) * lengthOfSpace + 10 * (int) (i / 3), null);
+                                g.drawImage(initializeBoard.redCircle, (i % 3) * lengthOfSpace + 10 * (i % 3), (int) (i / 3) * lengthOfSpace + 10 * (int) (i / 3), null);
                             }
                         }
                     }
@@ -162,18 +208,18 @@ public class Game implements Runnable{
                     g.setFont(largerFont);
                     if (won) {
                         int stringWidth = g2.getFontMetrics().stringWidth(wonString);
-                        g.drawString(wonString, width / 2 - stringWidth / 2, height / 2);
+                        g.drawString(wonString, initializeBoard.getWidth() / 2 - stringWidth / 2, initializeBoard.getHeight() / 2);
                     } else if (enemyWon) {
                         int stringWidth = g2.getFontMetrics().stringWidth(enemyWonString);
-                        g.drawString(enemyWonString, width / 2 - stringWidth / 2, height / 2);
+                        g.drawString(enemyWonString, initializeBoard.getWidth() / 2 - stringWidth / 2, initializeBoard.getHeight() / 2);
                     }
                 }
-                if (tie) {
+                if (draw) {
                     Graphics2D g2 = (Graphics2D) g;
                     g.setColor(Color.BLACK);
                     g.setFont(largerFont);
-                    int stringWidth = g2.getFontMetrics().stringWidth(tieString);
-                    g.drawString(tieString, width / 2 - stringWidth / 2, height / 2);
+                    int stringWidth = g2.getFontMetrics().stringWidth(drawString);
+                    g.drawString(drawString, initializeBoard.getWidth() / 2 - stringWidth / 2, initializeBoard.getHeight() / 2);
                 }
             } else {
                 g.setColor(Color.RED);
@@ -181,22 +227,22 @@ public class Game implements Runnable{
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
                 int stringWidth = g2.getFontMetrics().stringWidth(waitingString);
-                g.drawString(waitingString, width / 2 - stringWidth / 2, height / 2);
+                g.drawString(waitingString, initializeBoard.getWidth() / 2 - stringWidth / 2, initializeBoard.getHeight() / 2);
             }
 
         }
 
-        private void tick() {
+        public void tick() {
             if (errors >= 10) unableToCommunicateWithOpponent = true;
 
-            if (!yourTurn && !unableToCommunicateWithOpponent) {
+            if (!network.isYourTurn() && !unableToCommunicateWithOpponent) {
                 try {
-                    int space = dis.readInt();
-                    if (circle) spaces[space] = "X";
+                    int space = network.getDis().readInt();
+                    if (network.isCircle()) spaces[space] = "X";
                     else spaces[space] = "O";
                     checkForEnemyWin();
-                    checkForTie();
-                    yourTurn = true;
+                    checkForDraw();
+                    network.setYourTurn(true);
                 } catch (IOException e) {
                     e.printStackTrace();
                     errors++;
@@ -204,9 +250,9 @@ public class Game implements Runnable{
             }
         }
 
-        private void checkForWin() {
+        public void checkForWin() {
             for (int i = 0; i < wins.length; i++) {
-                if (circle) {
+                if (network.isCircle()) {
                     if (spaces[wins[i][0]] == "O" && spaces[wins[i][1]] == "O" && spaces[wins[i][2]] == "O") {
                         firstSpot = wins[i][0];
                         secondSpot = wins[i][2];
@@ -222,9 +268,9 @@ public class Game implements Runnable{
             }
         }
 
-        private void checkForEnemyWin() {
+        public void checkForEnemyWin() {
             for (int i = 0; i < wins.length; i++) {
-                if (circle) {
+                if (network.isCircle()) {
                     if (spaces[wins[i][0]] == "X" && spaces[wins[i][1]] == "X" && spaces[wins[i][2]] == "X") {
                         firstSpot = wins[i][0];
                         secondSpot = wins[i][2];
@@ -240,16 +286,16 @@ public class Game implements Runnable{
             }
         }
 
-        private void checkForTie() {
+        public void checkForDraw() {
             for (int i = 0; i < spaces.length; i++) {
                 if (spaces[i] == null) {
                     return;
                 }
             }
-            tie = true;
+            draw = true;
         }
 
-        private void listenForServerRequest() {
+        /*private void listenForServerRequest() {
             Socket socket = null;
             try {
                 socket = serverSocket.accept();
@@ -284,9 +330,9 @@ public class Game implements Runnable{
             }
             yourTurn = true;
             circle = false;
-        }
+        }*/
 
-        private void loadImages() {
+        /*private void loadImages() {
             try {
                 board = ImageIO.read(getClass().getResourceAsStream("/board.png"));
                 redX = ImageIO.read(getClass().getResourceAsStream("/redX.png"));
@@ -296,14 +342,14 @@ public class Game implements Runnable{
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
 
         //@SuppressWarnings("unused")
         //public static void main(String[] args) {
             //Game ticTacToe = new Game();
         //}
 
-        private class Painter extends JPanel implements MouseListener {
+        /*private class Painter extends JPanel implements MouseListener {
             private static final long serialVersionUID = 1L;
 
             public Painter() {
@@ -373,6 +419,6 @@ public class Game implements Runnable{
             }
 
         }
-
+*/
 
 }
