@@ -159,13 +159,13 @@ public class Game implements Runnable {
     public void checkForWin() {
         for (int[] ints : winsSize3) {
             if (network.isCircle()) {
-                if (spaces[ints[0]].equals("O") && spaces[ints[1]].equals("O") && spaces[ints[2]].equals("O")) {
+                if (spaces[ints[0]] =="O" && spaces[ints[1]] =="O" && spaces[ints[2]]=="O") {
                     calculateBoard.setFirstSpot(ints[0]);
                     calculateBoard.setSecondSpot(ints[2]);
                     won = true;
                 }
             } else {
-                if (spaces[ints[0]].equals("X") && spaces[ints[1]].equals("X") && spaces[ints[2]].equals("X")) {
+                if (spaces[ints[0]] =="X" && spaces[ints[1]] =="X" && spaces[ints[2]] == "X") {
                     calculateBoard.setFirstSpot(ints[0]);
                     calculateBoard.setSecondSpot(ints[2]);
                     won = true;
@@ -177,13 +177,13 @@ public class Game implements Runnable {
     public void checkForEnemyWin() {
         for (int i = 0; i < winsSize3.length; i++) {
             if (network.isCircle()) {
-                if (spaces[winsSize3[i][0]].equals("X") && spaces[winsSize3[i][1]].equals("X") && spaces[winsSize3[i][2]].equals("X")) {
+                if (spaces[winsSize3[i][0]] == "X" && spaces[winsSize3[i][1]] =="X" && spaces[winsSize3[i][2]] == "X") {
                     calculateBoard.setFirstSpot(winsSize3[i][0]);
                     calculateBoard.setSecondSpot(winsSize3[i][2]);
                     enemyWon = true;
                 }
             } else {
-                if (spaces[winsSize3[i][0]].equals("O") && spaces[winsSize3[i][1]].equals("O") && spaces[winsSize3[i][2]].equals("O")) {
+                if (spaces[winsSize3[i][0]] =="O" && spaces[winsSize3[i][1]]== "O" && spaces[winsSize3[i][2]] =="O") {
                     calculateBoard.setFirstSpot(winsSize3[i][0]);
                     calculateBoard.setSecondSpot(winsSize3[i][2]);
                     enemyWon = true;
