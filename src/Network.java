@@ -16,7 +16,7 @@ public class Network {
     public boolean circle = true;
     private ServerSocket serverSocket;
 
-    public Network(String IP, String port){
+    public Network(String IP, String port) {
         this.port = port;
         this.IP = IP;
         if (!connect()) initializeServer();

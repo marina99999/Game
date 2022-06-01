@@ -5,6 +5,11 @@ public class UserInteraction {
     private String IP;
     private String name;
     private String port;
+    private String waitingString = "Waiting for another player";
+    private String unableToCommunicateWithOpponentString = "Unable to communicate with the enemy.";
+    private String wonString = "You are the winner!";
+    private String enemyWonString = "Enemy is the winner!";
+    private String drawString = "The game ended in a draw.";
 
     public UserInteraction(){
     }
@@ -28,5 +33,29 @@ public class UserInteraction {
         }
         port = String.valueOf(portInteger);
         return new String[]{name, IP, port};
+    }
+
+    public String getIP() {
+        return IP;
+    }
+
+    public String getWaitingString() {
+        return waitingString;
+    }
+
+    public String getUnableToCommunicateWithOpponentString() {
+        return unableToCommunicateWithOpponentString;
+    }
+
+    public String getWonString() {
+        return wonString;
+    }
+
+    public String getEnemyWonString() {
+        return enemyWonString;
+    }
+
+    public String getDrawString() {
+        return drawString;
     }
 }

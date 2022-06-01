@@ -33,8 +33,8 @@ public class Painter extends JPanel implements MouseListener {
     public void mouseClicked(MouseEvent e) {
         if (network.accepted) {
             if (network.isYourTurn() && !game.unableToCommunicateWithOpponent && !game.won && !game.enemyWon) {
-                int x = e.getX() / game.lengthOfSpace;
-                int y = e.getY() / game.lengthOfSpace;
+                int x = e.getX() / game.getCalculateBoard().getLengthOfSpace();
+                int y = e.getY() / game.getCalculateBoard().getLengthOfSpace();
                 y *= 3;
                 int position = x + y;
 

@@ -13,15 +13,15 @@ public class InitializeBoard extends JFrame {
     public BufferedImage blueX;
     public BufferedImage redCircle;
     public BufferedImage blueCircle;
+    private Player player;
 
-    public InitializeBoard(int width, int height, Painter painter){
+    public InitializeBoard(int width, int height, Painter painter, Player player){
         this.width = width;
         this.height = height;
-
+        this.player = player;
         //painter = new Game.Painter();
         painter.setPreferredSize(new Dimension(width, height));
-
-        setTitle("TicTacToe");
+        setTitle("TicTacToe " + player.getName());
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setContentPane(painter);
         setSize(width, height);
@@ -58,5 +58,9 @@ public class InitializeBoard extends JFrame {
 
     public void setHeight(int height) {
         this.height = height;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 }
