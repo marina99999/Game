@@ -7,3 +7,5 @@
 -	Anschließend den Namen des Spielers eingeben
 -	IP: localhost oder 127.0.0.1 eingeben
 -	Port: beide eingegebenen Ports müssen identisch sein, ansonsten entsteht keine Verbindung
+
+#.jar File befindet sich im Develop Branch
