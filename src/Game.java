@@ -34,16 +34,13 @@ public class Game implements Runnable {
     private Font smallerFont = new Font("Verdana", Font.BOLD, 20);
     private Font largerFont = new Font("Verdana", Font.BOLD, 50);
 
-
+    /** Spielfeld nach Zahlen sortiert
+     *0, 1, 2
+     *3, 4, 5
+     *6, 7, 8
+     */
     private int[][] winsSize3 = new int[][]{{0, 1, 2}, {3, 4, 5}, {6, 7, 8}, {0, 3, 6}, {1, 4, 7}, {2, 5, 8}, {0, 4, 8}, {2, 4, 6}};
 
-    /**
-     * <pre>
-     * 0, 1, 2
-     * 3, 4, 5
-     * 6, 7, 8
-     * </pre>
-     */
 
     public Game(Network network, Player player, UserInteraction userInteraction) {
         this.player = player;
@@ -59,6 +56,9 @@ public class Game implements Runnable {
         thread.start();
     }
 
+    /**
+     * solange es keine Verbindung gibt, wird die Methode listenForServerRequest ausgeführt
+     */
     public void run() {
         while (true) {
             tick();
@@ -74,7 +74,7 @@ public class Game implements Runnable {
     public void render(Graphics g) {
         g.drawImage(initializeBoard.board, 0, 0, null);
         if (unableToCommunicateWithOpponent) {
-            g.setColor(Color.RED);
+            g.setColor(Color.ORANGE);
             g.setFont(smallerFont);
             Graphics2D g2 = (Graphics2D) g;
             g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -107,7 +107,7 @@ public class Game implements Runnable {
                 g.setColor(Color.BLACK);
                 g.drawLine(calculateBoard.calculateXOneCoordinate(), calculateBoard.calculateYOneCoordinate(), calculateBoard.calculateXTwoCoordinate(), calculateBoard.calculateYTwoCoordinate());
 
-                g.setColor(Color.RED);
+                g.setColor(Color.GREEN);
                 g.setFont(largerFont);
                 if (won) {
                     int stringWidth = g2.getFontMetrics().stringWidth(userInteraction.getWonString());
@@ -125,7 +125,7 @@ public class Game implements Runnable {
                 g.drawString(userInteraction.getEnemyWonString(), initializeBoard.getWidth() / 2 - stringWidth / 2, initializeBoard.getHeight() / 2);
             }
         } else {
-            g.setColor(Color.RED);
+            g.setColor(Color.ORANGE);
             g.setFont(font);
             Graphics2D g2 = (Graphics2D) g;
             g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -143,7 +143,7 @@ public class Game implements Runnable {
 
         if (!network.isYourTurn() && !unableToCommunicateWithOpponent) {
             try {
-                int space = network.getDis().readInt();
+                int space = network.getDataInputStream().readInt();
                 if (network.isCircle()) spaces[space] = "X";
                 else spaces[space] = "O";
                 checkForEnemyWin();
@@ -156,6 +156,9 @@ public class Game implements Runnable {
         }
     }
 
+    /**
+     * Überprüfung ob ein SPieler gewonnen hat
+     */
     public void checkForWin() {
         for (int[] ints : winsSize3) {
             if (network.isCircle()) {

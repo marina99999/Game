@@ -18,15 +18,26 @@ public class UserInteraction {
         this.name = name;
     }
 
+    /**
+     * UserInput liest die Nutzereingabe
+     * @return ein Array, welches die drei Eingaben beinhaltet
+     */
     public String[] UserInput(){
+        int portInteger = 0;
         System.out.println("Please enter your Playername");
         Scanner scanner = new Scanner(System.in);
         name = scanner.nextLine();
         System.out.println("Please input the IP: ");
-        String IP = scanner.nextLine();
+        try {
+            String IP = scanner.nextLine();
+        }
+        catch (Exception e) {
+            e.getMessage();
+        }
+
         System.out.println("Please input the port: ");
-        port = scanner.nextLine();
-        int portInteger = Integer. valueOf(port);
+        portInteger = scanner.nextInt();
+
         while (portInteger < 1 || portInteger > 65535) {
             System.out.println("The port you entered was invalid, please input another port: ");
             portInteger = scanner.nextInt();
@@ -35,9 +46,6 @@ public class UserInteraction {
         return new String[]{name, IP, port};
     }
 
-    public String getIP() {
-        return IP;
-    }
 
     public String getWaitingString() {
         return waitingString;

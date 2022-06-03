@@ -6,6 +6,7 @@ import java.io.IOException;
 
 public class InitializeBoard extends JFrame {
 
+    private Painter painter;
     private  int width;
     private int height;
     public BufferedImage board;
@@ -15,10 +16,18 @@ public class InitializeBoard extends JFrame {
     public BufferedImage blueCircle;
     private Player player;
 
+    /**
+     * j
+     * @param width Spielfeldbreite
+     * @param height Spielfeldhöhe
+     * @param painter
+     * @param player Name des Spielers
+     */
     public InitializeBoard(int width, int height, Painter painter, Player player){
         this.width = width;
         this.height = height;
         this.player = player;
+        this.painter = painter;
         //painter = new Game.Painter();
         painter.setPreferredSize(new Dimension(width, height));
         setTitle("TicTacToe " + player.getName());
@@ -30,6 +39,9 @@ public class InitializeBoard extends JFrame {
         setVisible(true);
     }
 
+    /**
+     * die Bilder für das Spiel werden den Variablen zugewiesen
+     */
     public void loadImages() {
         try {
             board = ImageIO.read(getClass().getResourceAsStream("/board.png"));

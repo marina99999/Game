@@ -11,14 +11,12 @@ public class Painter extends JPanel implements MouseListener {
     private static final long serialVersionUID = 1L;
 
     public Painter(Network network, Game game) {
-        //Neuer Code
         this.game = game;
-        //Bis hier
         this.network = network;
         setFocusable(true);
         requestFocus();
         setBackground(Color.WHITE);
-        setPreferredSize(new Dimension(506, 527));
+        //setPreferredSize(new Dimension(506, 527));
         addMouseListener(this);
 
     }
@@ -39,15 +37,15 @@ public class Painter extends JPanel implements MouseListener {
                 int position = x + y;
 
                 if (game.spaces[position] == null) {
-                    if (!network.circle) game.spaces[position] = "X";
+                    if (!network.isCircle()) game.spaces[position] = "X";
                     else game.spaces[position] = "O";
                     network.setYourTurn(false);
                     repaint();
                     Toolkit.getDefaultToolkit().sync();
 
                     try {
-                        network.getDos().writeInt(position);
-                        network.getDos().flush();
+                        network.getDataOutputStream().writeInt(position);
+                        network.getDataOutputStream().flush();
                     } catch (IOException e1) {
                         game.errors++;
                         e1.printStackTrace();

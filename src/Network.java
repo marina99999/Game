@@ -8,17 +8,17 @@ import java.net.Socket;
 public class Network {
     public boolean accepted = false;
     private String port;
-    private String IP;
+    private String ip;
     private Socket socket;
-    private DataOutputStream dos;
-    private DataInputStream dis;
+    private DataOutputStream dataOutputStream;
+    private DataInputStream dataInputStream;
     private boolean yourTurn = false;
-    public boolean circle = true;
+    private boolean circle = true;
     private ServerSocket serverSocket;
 
-    public Network(String IP, String port) {
+    public Network(String ip, String port) {
         this.port = port;
-        this.IP = IP;
+        this.ip = ip;
         if (!connect()) initializeServer();
     }
 
@@ -26,8 +26,8 @@ public class Network {
         Socket socket = null;
         try {
             socket = serverSocket.accept();
-            this.dos = new DataOutputStream(socket.getOutputStream());
-            this.dis = new DataInputStream(socket.getInputStream());
+            this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
+            this.dataInputStream = new DataInputStream(socket.getInputStream());
             accepted = true;
             System.out.println("CLIENT HAS REQUESTED TO JOIN, AND WE HAVE ACCEPTED");
         } catch (IOException e) {
@@ -39,12 +39,13 @@ public class Network {
 
         try {
             int portInteger = Integer.parseInt(port);
-            this.socket = new Socket(IP, portInteger);
-            this.dos = new DataOutputStream(socket.getOutputStream());
-            this.dis = new DataInputStream(socket.getInputStream());
+            this.socket = new Socket(ip, portInteger);
+            this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
+            this.dataInputStream = new DataInputStream(socket.getInputStream());
             this.accepted = true;
         } catch (IOException e) {
-            System.out.println("Unable to connect to the address: " + IP + ":" + port + " | Starting a server");
+            System.out.println("Unable to connect to the address: " + ip + ":" + port );
+            System.out.println("Starting a server");
             return false;
         }
         System.out.println("Successfully connected to the server.");
@@ -53,7 +54,7 @@ public class Network {
 
     private void initializeServer() {
         try {
-            this.serverSocket = new ServerSocket(Integer.parseInt(port), 8, InetAddress.getByName(IP));
+            this.serverSocket = new ServerSocket(Integer.parseInt(port), 8, InetAddress.getByName(ip));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -69,12 +70,12 @@ public class Network {
         this.port = port;
     }
 
-    public String getIP() {
-        return IP;
+    public String getIp() {
+        return ip;
     }
 
-    public void setIP(String IP) {
-        this.IP = IP;
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 
     public boolean isYourTurn() {
@@ -93,11 +94,11 @@ public class Network {
         this.circle = circle;
     }
 
-    public DataOutputStream getDos() {
-        return dos;
+    public DataOutputStream getDataOutputStream() {
+        return dataOutputStream;
     }
 
-    public DataInputStream getDis() {
-        return dis;
+    public DataInputStream getDataInputStream() {
+        return dataInputStream;
     }
 }
